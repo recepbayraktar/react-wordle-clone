@@ -1,0 +1,35 @@
+.app{
+  align-content: center;
+}
+
+.letter-block{
+  width: 100px;
+  height: 100px;
+  left: 300px;
+  top: 300px;
+  border-radius: 30px;
+
+}
+
+.letter-text{
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 48px;
+  text-align: center;
+  line-height: 100px;
+  text-transform: uppercase;
+}
+
+
+
+.letter-wrong-background{
+  background: #F5793A;
+}
+
+.letter-correct-background{
+  background: #02C39A;
+}
+.letter-default-background{
+  background: #48495F;
+}
