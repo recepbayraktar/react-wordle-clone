@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/recepbayraktar.github.io/static/css/main.d278a378.css",
+    "main.js": "/recepbayraktar.github.io/static/js/main.8093f2e0.js",
+    "static/js/787.e01666d6.chunk.js": "/recepbayraktar.github.io/static/js/787.e01666d6.chunk.js",
+    "index.html": "/recepbayraktar.github.io/index.html",
+    "main.d278a378.css.map": "/recepbayraktar.github.io/static/css/main.d278a378.css.map",
+    "main.8093f2e0.js.map": "/recepbayraktar.github.io/static/js/main.8093f2e0.js.map",
+    "787.e01666d6.chunk.js.map": "/recepbayraktar.github.io/static/js/787.e01666d6.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d278a378.css",
+    "static/js/main.8093f2e0.js"
+  ]
+}
