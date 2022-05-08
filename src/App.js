@@ -4,20 +4,22 @@ import React from 'react';
 import { nanoid } from 'nanoid'
 import Keyboard from 'react-simple-keyboard';
 import 'react-simple-keyboard/build/css/index.css';
+import { DialogProvider, useDialog } from "react-bootstrap-easy-dialog";
+import Result from './Result';
 
 function App() {
 
   const [isGameOver, setIsGameOver] = React.useState(false)
   const [wordData, setWordData] = React.useState(defaultWordData)
   const [round, setRound] = React.useState(0)
-  const [input, setInput] = React.useState("");
-  const keyboard = React.useRef();
+  const [input, setInput] = React.useState("")
+  const keyboard = React.useRef()
   const [layout, setLayout] = React.useState([
     "q w e r t y u i o p {bksp}",
     "a s d f g h j k l",
     "z x c v b n m"
   ]);
-  
+  const dialog = useDialog();
   const wordle = ["R","E","A","C","T"]
 
   function defaultWordData() {
@@ -35,7 +37,7 @@ function App() {
     })
     return wordArray
   }
-
+  
   React.useEffect(() => {
     if (round >= 5) {
       setIsGameOver((prev) => !prev)
@@ -115,8 +117,8 @@ function App() {
         {wordsElement}
       </div>
       
-      {
-        !isGameOver ? 
+      
+      
           <div className='col-sm-6 '>
             <div className=''>
             <button type='button' disabled={ input.length < 5 ? 'disabled' : ''} className='btn btn-info rounded mt-3 ' onClick={endRound}>Submit</button> 
@@ -133,15 +135,16 @@ function App() {
                 maxLength={5}
                 useButtonTag= {true}
               />
-
             </div>
           </div>
-        :
+        
         <div className='col-sm-5 my-5 offset-sm-3'>
-          <h1>GAME OVER</h1>
+          <DialogProvider>
+            <Result  isGameOver={isGameOver} />
+          </DialogProvider>
         </div>
 
-      }
+      
     </div>
   )
 }
