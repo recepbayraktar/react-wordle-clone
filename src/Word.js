@@ -16,7 +16,7 @@ export default function Word(props) {
         )
     })
     return (
-        <div className='row col-sm-6 offset-sm-3 mt-4'>
+        <div className='row  mt-2'>
             {letterElements}
         </div>
     )

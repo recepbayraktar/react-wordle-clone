@@ -2,46 +2,38 @@ import './App.css';
 import React from 'react';
 
 export default function Letter(props) {
-    let style = blockStyle();
+    let style = {
+        color:{color: "#A3A3AE"},
+        background:{background:"#48495F"}
+    }
+    
+    blockStyle();
     function blockStyle() {
         if (props.status === "correct") {
-            return (
-                { 
-                    color: {color: "#1D6B55"},
-                    background:{background: "#02C39A"}
-                }
-            )
+            
+            style.color =  {color:"#1D6B55"}
+            style.background = {background:"#02C39A"}
+
         }
         else if(props.status === "wrong")
         {
-            return (
-                { 
-                    color:{color: "#934B27"},
-                    background:{background: "#F5793A"}
-                }
-            )
+            style.color =  {color:"#934B27"}
+            style.background = {background:"#F5793A"}
+              
         }
         else if(props.status === "includes"){
-            return (
-                { 
-                    color:{color: "#837035"},
-                    background:{background: "#FDD85D"}
-                }
-            )
+      
+            style.color =  {color:"#837035"}
+            style.background = {background:"#FDD85D"}
         }
         else {
-            return (
-                { 
-                    color:{color: "#A3A3AE"},
-                    background:{background:"#48495F"}
-                }
-            
-            )
+            style.color =  {color:"#A3A3AE"}
+            style.background = {background:"#48495F"}
         }
     }
 
     return (
-        <div className='col-sm-1 mx-4 '>
+        <div className='letter'>
             {
                 <div className="letter-block" style={style.background}><div className='letter-text' 
                 style={style.color}>{props.value }</div> </div>

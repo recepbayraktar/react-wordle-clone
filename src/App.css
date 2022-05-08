@@ -2,6 +2,12 @@
   align-content: center;
 }
 
+.disabled{
+  color: aqua;
+}
+.letter{
+  width: fit-content;
+}
 .letter-block{
   width: 100px;
   height: 100px;
