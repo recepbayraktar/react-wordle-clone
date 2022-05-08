@@ -4,25 +4,17 @@ import React from 'react';
 import { nanoid } from 'nanoid'
 import Keyboard from 'react-simple-keyboard';
 import 'react-simple-keyboard/build/css/index.css';
-/* 
-yanlış harflerden yanlızca biri siliniyor
-direkt klavyeden input alma 
-sonuç ekranı
-virtual klavyede tuşları disable yapma 
-kelimeleri api veya array'den rastgele çekme 
-tasarım
-*/
+
 function App() {
 
   const [isGameOver, setIsGameOver] = React.useState(false)
   const [wordData, setWordData] = React.useState(defaultWordData)
   const [round, setRound] = React.useState(0)
   const [input, setInput] = React.useState("");
-  const [layoutName, setLayoutName] = React.useState("default");
   const keyboard = React.useRef();
   const [layout, setLayout] = React.useState([
     "q w e r t y u i o p {bksp}",
-    "a s d f g h j k l {enter}",
+    "a s d f g h j k l",
     "z x c v b n m"
   ]);
   
@@ -50,38 +42,27 @@ function App() {
     }
   }, [round])
 
-  function generateWord(userInput) {
-      
-      while( 5 > userInput.length) {
-          userInput.push("")
-      }
-    
-      wordData[round].letters = userInput.map((letter) => {
-        return ({
-          id: nanoid(),
-          value: letter,
-          status: "default"
-        })
-      }) 
-  }
   function endRound(){
-    const userInput = checkInput()
+    const userInput = formatInput([...input], true)
     setWordData(prevData => prevData.map((word, index) => index === round ? userInput : word))
     checkWin(userInput)
     updateLayout(userInput)
     setRound((prevRound) => prevRound = prevRound + 1)
     keyboard.current.clearInput(); 
-    console.log(typeof keyboard.current.buttonElements.a[0])
   }
-  function checkInput() {
+  function formatInput(userInput, isSubmit=null) {
+    
+    while( 5 > userInput.length) {
+      userInput.push("")
+    }
     return (
       {
         wordId:wordData[round].wordId,
-        letters:[...input].map((letter, index) => {
+        letters:userInput.map((letter, index) => {
           return ({
             id: nanoid(),
             value: letter,
-            status: checkLetterStatus(letter.toUpperCase(),index)
+            status: isSubmit ? checkLetterStatus(letter.toUpperCase(),index) : "default"
           })
         }) 
       }
@@ -92,17 +73,15 @@ function App() {
     if (userInput.letters[0].status === "correct" && userInput.letters.every( v => v.status === userInput.letters[0].status)) {
       setIsGameOver(prev => !prev)
     }
-    else{
-      console.log(isGameOver)
-    }
   }
   function  updateLayout(userInput) {
-    
-    userInput.letters.map((item) => { 
-      if (item.status === "wrong") {
-        setLayout(layout.map((layoutGroup) => layoutGroup.replace(item.value,"").replace("  "," ")))
+    var arr = layout
+    userInput.letters.map((letter) => { 
+      if (letter.status === "wrong") {
+         arr = arr.map((layoutGroup) => layoutGroup.replace(letter.value,""))
       }
     }) 
+    setLayout(arr)
   }
   function checkLetterStatus(letter,index){
     if (wordle.includes(letter)) {
@@ -116,7 +95,7 @@ function App() {
     }
   }
   
-  const wordElement = wordData.map(word => {
+  const wordsElement = wordData.map(word => {
     return <Word 
     key={word.wordId}
     letters={word.letters}
@@ -126,38 +105,36 @@ function App() {
   const onChange = userInput => {
       setInput(userInput); 
       userInput = userInput.toUpperCase()
-      generateWord([...userInput])
-      // size'ı 5 olan bir array'e userInput atanabilir
+      const formatedInput = formatInput([...userInput])
+      setWordData(prevData => prevData.map((word, index) => index === round ? formatedInput : word))
   };
 
-
   return (
-    <div className='row'>
-
-      {wordElement}
-
+    <div className='container  offset-lg-3'>
+      <div className=''>
+        {wordsElement}
+      </div>
+      
       {
         !isGameOver ? 
-          <div className='col-sm-5 my-5 offset-sm-3'>
-            <Keyboard
-              keyboardRef={r => (keyboard.current = r)}
-              layoutName={layoutName}
-              onChange={onChange}
-              layout={{
-                default: layout,
-                shift: []
-              }}
-              maxLength={5}
-              buttonAttributes={
-                {
-                  attribute: "aria-label",
-                  value: "bee",
-                  buttons: "b B"
-                }
-              }
-              
-            />
-            <button className='btn btn-info rounded mt-3 mr-auto' onClick={endRound}>Submit</button>  
+          <div className='col-sm-6 '>
+            <div className=''>
+            <button type='button' disabled={ input.length < 5 ? 'disabled' : ''} className='btn btn-info rounded mt-3 ' onClick={endRound}>Submit</button> 
+            </div>
+            <div className='mt-3'>
+              <Keyboard
+                keyboardRef={r => (keyboard.current = r)}
+                layoutName={"default"}
+                onChange={onChange}
+                layout={{
+                  default: layout,
+                  shift: []
+                }}
+                maxLength={5}
+                useButtonTag= {true}
+              />
+
+            </div>
           </div>
         :
         <div className='col-sm-5 my-5 offset-sm-3'>
