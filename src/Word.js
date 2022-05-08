@@ -8,9 +8,9 @@ export default function Word(props) {
         return (
 
             <Letter 
-                key={item.letterId}
-                letter={item.letter}
-                letterStatus={item.letterStatus}
+                key={item.id}
+                value={item.value}
+                status={item.status}
             />
            
         )

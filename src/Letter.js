@@ -2,19 +2,17 @@ import './App.css';
 import React from 'react';
 
 export default function Letter(props) {
-
     let style = blockStyle();
     function blockStyle() {
-        if (props.letterStatus === "correct") {
+        if (props.status === "correct") {
             return (
                 { 
                     color: {color: "#1D6B55"},
-
                     background:{background: "#02C39A"}
                 }
             )
         }
-        else if(props.letterStatus === "wrong")
+        else if(props.status === "wrong")
         {
             return (
                 { 
@@ -23,7 +21,7 @@ export default function Letter(props) {
                 }
             )
         }
-        else if(props.letterStatus === "includes"){
+        else if(props.status === "includes"){
             return (
                 { 
                     color:{color: "#837035"},
@@ -45,9 +43,8 @@ export default function Letter(props) {
     return (
         <div className='col-sm-1 mx-4 '>
             {
-
                 <div className="letter-block" style={style.background}><div className='letter-text' 
-                style={style.color}>{props.letter }</div> </div>
+                style={style.color}>{props.value }</div> </div>
             }
             
         </div>

@@ -4,7 +4,14 @@ import React from 'react';
 import { nanoid } from 'nanoid'
 import Keyboard from 'react-simple-keyboard';
 import 'react-simple-keyboard/build/css/index.css';
-
+/* 
+yanlış harflerden yanlızca biri siliniyor
+direkt klavyeden input alma 
+sonuç ekranı
+virtual klavyede tuşları disable yapma 
+kelimeleri api veya array'den rastgele çekme 
+tasarım
+*/
 function App() {
 
   const [isGameOver, setIsGameOver] = React.useState(false)
@@ -22,29 +29,17 @@ function App() {
   const wordle = ["R","E","A","C","T"]
 
   function defaultWordData() {
-    let wordArray = Array(5).fill({
-        wordId: "",
-        letters: Array(5).fill({
-          letterId: "",
-          letter: "",
-          letterStatus: "default"
+    let wordArray = Array(5).fill(null).map(() => {
+      return {
+        wordId: nanoid(),
+        letters: Array(5).fill(null).map(() => {
+          return {
+            id: nanoid(),
+            letter: "",
+            status: "default"
+          }
         })
-      })
-    wordArray = wordArray.map(word => {
-      return (
-        {
-          wordId:nanoid(),
-          letters: word.letters.map(letter => {
-          return (
-            {
-              letterId : nanoid(),
-              letter : "",
-              letterStatus : "default"
-            }
-          )
-        })
-        }
-      )
+      }
     })
     return wordArray
   }
@@ -53,47 +48,63 @@ function App() {
     if (round >= 5) {
       setIsGameOver((prev) => !prev)
     }
-
   }, [round])
-
-  function gameStatus(params) {
-    
-    
-  }
 
   function generateWord(userInput) {
       
       while( 5 > userInput.length) {
           userInput.push("")
       }
+    
       wordData[round].letters = userInput.map((letter) => {
         return ({
-          letterId: nanoid(),
-          letter: letter,
-          letterStatus: "default"
+          id: nanoid(),
+          value: letter,
+          status: "default"
         })
       }) 
-  
   }
-
-  function checkInput(){
-    wordData[round].letters = [...input].map((letter, index) => {
-      return ({
-        letterId: nanoid(),
-        letter: letter,
-        letterStatus: setLetterStatus(letter.toUpperCase(),index)
-      })
-    })
-    wordData[round].letters.map((item) => { 
-      if (item.letterStatus === "wrong") {
-        setLayout(layout.map((layoutGroup) => layoutGroup.replace(item.letter,"").replace("  "," ")))
-      }
-    })
+  function endRound(){
+    const userInput = checkInput()
+    setWordData(prevData => prevData.map((word, index) => index === round ? userInput : word))
+    checkWin(userInput)
+    updateLayout(userInput)
     setRound((prevRound) => prevRound = prevRound + 1)
     keyboard.current.clearInput(); 
+    console.log(typeof keyboard.current.buttonElements.a[0])
   }
-  
-  function setLetterStatus(letter,index){
+  function checkInput() {
+    return (
+      {
+        wordId:wordData[round].wordId,
+        letters:[...input].map((letter, index) => {
+          return ({
+            id: nanoid(),
+            value: letter,
+            status: checkLetterStatus(letter.toUpperCase(),index)
+          })
+        }) 
+      }
+    ) 
+  }
+  function checkWin(userInput){
+    
+    if (userInput.letters[0].status === "correct" && userInput.letters.every( v => v.status === userInput.letters[0].status)) {
+      setIsGameOver(prev => !prev)
+    }
+    else{
+      console.log(isGameOver)
+    }
+  }
+  function  updateLayout(userInput) {
+    
+    userInput.letters.map((item) => { 
+      if (item.status === "wrong") {
+        setLayout(layout.map((layoutGroup) => layoutGroup.replace(item.value,"").replace("  "," ")))
+      }
+    }) 
+  }
+  function checkLetterStatus(letter,index){
     if (wordle.includes(letter)) {
       if (wordle[index] === letter)
         return "correct"
@@ -104,7 +115,7 @@ function App() {
       return "wrong"
     }
   }
-
+  
   const wordElement = wordData.map(word => {
     return <Word 
     key={word.wordId}
@@ -112,12 +123,11 @@ function App() {
     />
   })
   
-
   const onChange = userInput => {
       setInput(userInput); 
       userInput = userInput.toUpperCase()
-      generateWord([...userInput], [...wordle], round)
-
+      generateWord([...userInput])
+      // size'ı 5 olan bir array'e userInput atanabilir
   };
 
 
@@ -127,7 +137,7 @@ function App() {
       {wordElement}
 
       {
-      !isGameOver ? 
+        !isGameOver ? 
           <div className='col-sm-5 my-5 offset-sm-3'>
             <Keyboard
               keyboardRef={r => (keyboard.current = r)}
@@ -138,8 +148,16 @@ function App() {
                 shift: []
               }}
               maxLength={5}
+              buttonAttributes={
+                {
+                  attribute: "aria-label",
+                  value: "bee",
+                  buttons: "b B"
+                }
+              }
+              
             />
-            <button className='btn btn-info rounded mt-3 mr-auto' onClick={checkInput}>Submit</button>  
+            <button className='btn btn-info rounded mt-3 mr-auto' onClick={endRound}>Submit</button>  
           </div>
         :
         <div className='col-sm-5 my-5 offset-sm-3'>
