@@ -4,8 +4,9 @@ import React from 'react';
 import { nanoid } from 'nanoid'
 import Keyboard from 'react-simple-keyboard';
 import 'react-simple-keyboard/build/css/index.css';
-import { DialogProvider, useDialog } from "react-bootstrap-easy-dialog";
-import Result from './Result';
+import { Modal, Button } from 'react-bootstrap/';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 function App() {
 
@@ -14,13 +15,20 @@ function App() {
   const [round, setRound] = React.useState(0)
   const [input, setInput] = React.useState("")
   const keyboard = React.useRef()
-  const [layout, setLayout] = React.useState([
-    "q w e r t y u i o p {bksp}",
-    "a s d f g h j k l",
-    "z x c v b n m"
-  ]);
-  const dialog = useDialog();
+  const [layout, setLayout] = React.useState(defaultLayout());
+
   const wordle = ["R","E","A","C","T"]
+
+
+  const [show, setShow] = React.useState(false);
+
+  const handleClose = () => {
+    setShow(false)
+    setWordData(defaultWordData())
+    setRound(0)
+    setLayout(defaultLayout())
+  }
+  const handleShow = () => setShow(true);
 
   function defaultWordData() {
     let wordArray = Array(5).fill(null).map(() => {
@@ -37,10 +45,19 @@ function App() {
     })
     return wordArray
   }
+
+  function defaultLayout(){
+    return [
+      "q w e r t y u i o p {bksp}",
+      "a s d f g h j k l",
+      "z x c v b n m"
+    ]  
+  }
   
   React.useEffect(() => {
     if (round >= 5) {
       setIsGameOver((prev) => !prev)
+      handleShow();
     }
   }, [round])
 
@@ -74,6 +91,7 @@ function App() {
     
     if (userInput.letters[0].status === "correct" && userInput.letters.every( v => v.status === userInput.letters[0].status)) {
       setIsGameOver(prev => !prev)
+      handleShow();
     }
   }
   function  updateLayout(userInput) {
@@ -112,16 +130,13 @@ function App() {
   };
 
   return (
-    <div className='container  offset-lg-3'>
+    <div className='container app'>
       <div className=''>
         {wordsElement}
       </div>
-      
-      
-      
-          <div className='col-sm-6 '>
+        <div className='col-sm-6 offset-lg-3'>
             <div className=''>
-            <button type='button' disabled={ input.length < 5 ? 'disabled' : ''} className='btn btn-info rounded mt-3 ' onClick={endRound}>Submit</button> 
+            <Button disabled={ input.length < 5 ? 'disabled' : ''} className='mt-3 ml-5 submit-button' onClick={endRound}>Submit </Button> 
             </div>
             <div className='mt-3'>
               <Keyboard
@@ -136,14 +151,19 @@ function App() {
                 useButtonTag= {true}
               />
             </div>
-          </div>
-        
-        <div className='col-sm-5 my-5 offset-sm-3'>
-          <DialogProvider>
-            <Result  isGameOver={isGameOver} />
-          </DialogProvider>
         </div>
-
+      
+        <Modal show={show} onHide={handleClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Game Over</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>Result</Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
       
     </div>
   )

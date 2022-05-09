@@ -33,7 +33,7 @@ export default function Letter(props) {
     }
 
     return (
-        <div className='letter'>
+        <div className='col-sm-1 mx-2'>
             {
                 <div className="letter-block" style={style.background}><div className='letter-text' 
                 style={style.color}>{props.value }</div> </div>

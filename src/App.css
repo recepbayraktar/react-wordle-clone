@@ -1,19 +1,19 @@
-.app{
-  align-content: center;
+.submit-button{
+  background-color: #85C0F9;
+  color: #547596;
+  font-weight:bold;
+  font-family: 'Nunito';
+  font-style: normal;
 }
 
-.disabled{
-  color: aqua;
-}
-.letter{
-  width: fit-content;
-}
+
+
 .letter-block{
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   left: 300px;
   top: 300px;
-  border-radius: 30px;
+  border-radius: 20px;
 
 }
 

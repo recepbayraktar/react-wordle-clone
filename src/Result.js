@@ -14,10 +14,12 @@ export default function Page(props) {
                 </div>
                 <div>
                     <h6>Results</h6>
+                    <button onClick={() => dialog.hide()}>Play again</button>
                 </div>
             </div>
-
         )
+        
+       
     }
       
   }
