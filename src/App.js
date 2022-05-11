@@ -1,25 +1,23 @@
 import React from "react";
-import Word from "./Word";
 import { nanoid } from "nanoid";
-import Keyboard from "react-simple-keyboard";
-import "react-simple-keyboard/build/css/index.css";
 import { Modal, Button, Alert } from "react-bootstrap/";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+import Word from "./Word";
+import Keyboard from "./Keyboard";
 import { WORDS, wordle } from "./wordlist";
 
 function App() {
   const [isGameOver, setIsGameOver] = React.useState(false);
   const [wordData, setWordData] = React.useState(defaultWordData);
   const [round, setRound] = React.useState(0);
-  const [input, setInput] = React.useState("");
-  const keyboard = React.useRef();
+  const [input, setInput] = React.useState([]);
   const [layout, setLayout] = React.useState(defaultLayout());
   const [show, setShow] = React.useState(false);
   const [alert, setAlert] = React.useState(false);
+  
 
-  console.log(wordle);
-
+  console.log(wordle)
   const handleResultClose = () => {
     setShow(false);
     setWordData(defaultWordData());
@@ -49,7 +47,14 @@ function App() {
   }
 
   function defaultLayout() {
-    return ["q w e r t y u i o p {bksp}", "a s d f g h j k l", "z x c v b n m"];
+    return {
+      keys: [
+        ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
+        ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+        ["enter","z", "x", "c", "v", "b", "n", "m", "backspace"],
+      ],
+      disabledKeys: [],
+    };
   }
 
   React.useEffect(() => {
@@ -60,36 +65,36 @@ function App() {
   }, [round]);
 
   function endRound() {
-    if (WORDS.includes(input)) {
-      const userInput = formatInput([...input], true);
+    if (WORDS.includes(input.join(""))) {
+      const userInput = formatInput(input, true);
       setWordData((prevData) =>
         prevData.map((word, index) => (index === round ? userInput : word))
       );
       checkWin(userInput);
       updateLayout(userInput);
       setRound((prevRound) => (prevRound = prevRound + 1));
-      keyboard.current.clearInput();
+      setInput([]);
     } else {
       setAlert((prev) => !prev);
     }
   }
   function formatInput(userInput, isSubmit = null) {
-    while (5 > userInput.length) {
-      userInput.push("");
+    while (userInput.length < 5) {
+      userInput = [...userInput, ""];
     }
+
     return {
       wordId: wordData[round].wordId,
       letters: userInput.map((letter, index) => {
         return {
           id: nanoid(),
           value: letter,
-          status: isSubmit
-            ? checkLetterStatus(letter.toUpperCase(), index)
-            : "default",
+          status: isSubmit ? checkLetterStatus(letter, index) : "default",
         };
       }),
     };
   }
+
   function checkWin(userInput) {
     if (
       userInput.letters[0].status === "correct" &&
@@ -100,13 +105,16 @@ function App() {
     }
   }
   function updateLayout(userInput) {
-    var arr = layout;
     userInput.letters.map((letter) => {
       if (letter.status === "wrong") {
-        arr = arr.map((layoutGroup) => layoutGroup.replace(letter.value, ""));
+        setLayout((prev) => {
+          return {
+            ...prev,
+            disabledKeys: [...prev.disabledKeys, letter.value],
+          }
+        })
       }
-    });
-    setLayout(arr);
+    })
   }
   function checkLetterStatus(letter, index) {
     if (wordle.includes(letter)) {
@@ -121,19 +129,41 @@ function App() {
     return <Word key={word.wordId} letters={word.letters} />;
   });
 
-  const onChange = (userInput) => {
-    setInput(userInput);
-    userInput = userInput.toUpperCase();
-    const formatedInput = formatInput([...userInput]);
-    setWordData((prevData) =>
-      prevData.map((word, index) => (index === round ? formatedInput : word))
-    );
-  };
+  function handleClick(e) {
+    if (e.target.value === "enter") {
+      endRound()
+    }
+    else if (e.target.value === "backspace") {
+     input.pop()
+     let userInput = [...input];
+     if (userInput.length <= 5) {
+       setInput(userInput);
+       const formatedInput = formatInput(userInput);
+       setWordData((prevData) =>
+        prevData.map((word, index) => (index === round ? formatedInput : word))
+       );
+     }
+    }
+    else{
+      let userInput = [...input, e.target.value];
+    if (userInput.length <= 5) {
+      setInput(userInput);
+      const formatedInput = formatInput(userInput);
+      setWordData((prevData) =>
+        prevData.map((word, index) => (index === round ? formatedInput : word))
+      );
+    }
+    }
+  }
 
   return (
     <div className="container app">
       {alert ? (
-        <Alert variant="warning" onClose={() => setAlert((prev) => !prev)} dismissible>
+        <Alert
+          variant="warning"
+          onClose={() => setAlert((prev) => !prev)}
+          dismissible
+        >
           <Alert.Heading>Please enter valid word</Alert.Heading>
         </Alert>
       ) : (
@@ -152,16 +182,11 @@ function App() {
         </div>
         <div className="mt-3">
           <Keyboard
-            keyboardRef={(r) => (keyboard.current = r)}
-            theme={"hg-theme-default"}
-            onChange={onChange}
-            layout={{
-              default: layout,
-              shift: [],
-            }}
-            maxLength={5}
-            useButtonTag={true}
+            handleSubmit={endRound}
+            handleClick={handleClick} 
+            layout={layout} 
           />
+
         </div>
       </div>
 
