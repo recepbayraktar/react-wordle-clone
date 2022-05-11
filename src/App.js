@@ -5,18 +5,18 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import Word from "./Word";
 import Keyboard from "./Keyboard";
-import { WORDS, wordle } from "./wordlist";
+import { WORDS, randomWordle } from "./wordlist";
 
 function App() {
-  const [isGameOver, setIsGameOver] = React.useState(false);
   const [wordData, setWordData] = React.useState(defaultWordData);
   const [round, setRound] = React.useState(0);
   const [input, setInput] = React.useState([]);
   const [layout, setLayout] = React.useState(defaultLayout());
   const [show, setShow] = React.useState(false);
   const [alert, setAlert] = React.useState(false);
+  const [wordle, setWordle] = React.useState(randomWordle());
   
-
+  
   console.log(wordle)
   const handleResultClose = () => {
     setShow(false);
@@ -59,7 +59,6 @@ function App() {
 
   React.useEffect(() => {
     if (round >= 5) {
-      setIsGameOver((prev) => !prev);
       handleResultShow();
     }
   }, [round]);
@@ -68,12 +67,22 @@ function App() {
     if (WORDS.includes(input.join(""))) {
       const userInput = formatInput(input, true);
       setWordData((prevData) =>
-        prevData.map((word, index) => (index === round ? userInput : word))
-      );
-      checkWin(userInput);
+        prevData.map((word, index) => (index === round ? userInput : word)))
+
+      if (
+        userInput.letters[0].status === "correct" &&
+        userInput.letters.every((v) => v.status === userInput.letters[0].status))
+      {
+        handleResultShow()
+        setWordle(randomWordle())
+      }
+      else{
       updateLayout(userInput);
       setRound((prevRound) => (prevRound = prevRound + 1));
-      setInput([]);
+      
+      }
+      setInput([])
+
     } else {
       setAlert((prev) => !prev);
     }
@@ -95,15 +104,6 @@ function App() {
     };
   }
 
-  function checkWin(userInput) {
-    if (
-      userInput.letters[0].status === "correct" &&
-      userInput.letters.every((v) => v.status === userInput.letters[0].status)
-    ) {
-      setIsGameOver((prev) => !prev);
-      handleResultShow();
-    }
-  }
   function updateLayout(userInput) {
     userInput.letters.map((letter) => {
       if (letter.status === "wrong") {
@@ -116,6 +116,7 @@ function App() {
       }
     })
   }
+
   function checkLetterStatus(letter, index) {
     if (wordle.includes(letter)) {
       if (wordle[index] === letter) return "correct";
@@ -130,30 +131,27 @@ function App() {
   });
 
   function handleClick(e) {
+
+    var userInput
     if (e.target.value === "enter") {
       endRound()
     }
     else if (e.target.value === "backspace") {
      input.pop()
-     let userInput = [...input];
-     if (userInput.length <= 5) {
+     userInput = [...input]
+    }
+    else{
+      userInput = [...input, e.target.value];
+    }
+
+    if (userInput.length <= 5) {
        setInput(userInput);
        const formatedInput = formatInput(userInput);
        setWordData((prevData) =>
         prevData.map((word, index) => (index === round ? formatedInput : word))
        );
      }
-    }
-    else{
-      let userInput = [...input, e.target.value];
-    if (userInput.length <= 5) {
-      setInput(userInput);
-      const formatedInput = formatInput(userInput);
-      setWordData((prevData) =>
-        prevData.map((word, index) => (index === round ? formatedInput : word))
-      );
-    }
-    }
+    
   }
 
   return (

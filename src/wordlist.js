@@ -5758,7 +5758,9 @@ const WORDS = [
   'pupal',
 ]
 
-const wordle = WORDS[Math.floor(Math.random() * WORDS.length)].split('')
+function randomWordle(){
+  return WORDS[Math.floor(Math.random() * WORDS.length)].split('')
+}
 
 
-export  {WORDS ,wordle}
+export  {WORDS , randomWordle}
